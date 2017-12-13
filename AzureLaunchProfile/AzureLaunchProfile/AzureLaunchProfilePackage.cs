@@ -33,12 +33,13 @@ namespace Microsoft.VisualStudio.ProductionDebug.DebugProfile
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
     [Guid(AzureLaunchProfilePackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-    public sealed class AzureLaunchProfilePackage : Package
+    public sealed class AzureLaunchProfilePackage : Package, IVsUpdateSolutionEvents2
     {
         /// <summary>
         /// AzureLaunchProfilePackage GUID string.
         /// </summary>
         public const string PackageGuidString = "1785fb89-4237-40fa-8018-99f4b9d569ba";
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureLaunchProfilePackage"/> class.
@@ -49,6 +50,8 @@ namespace Microsoft.VisualStudio.ProductionDebug.DebugProfile
             // any Visual Studio service because at this point the package object is created but
             // not sited yet inside Visual Studio environment. The place to do all the other
             // initialization is the Initialize method.
+
+            SubscribeToUpdateSolutionEvents();
         }
 
         #region Package Members
@@ -60,6 +63,79 @@ namespace Microsoft.VisualStudio.ProductionDebug.DebugProfile
         protected override void Initialize()
         {
             base.Initialize();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            UnsubscribeUpdateSolutionEvents();
+        }
+
+        #endregion
+
+        #region IVsUpdateSolutionEvents2
+
+        private IVsSolutionBuildManager2 _solutionBuildManager = null;
+        private uint _updateSolutionEventsCookie;
+
+        private void SubscribeToUpdateSolutionEvents()
+        {
+            // Get solution build manager
+            _solutionBuildManager = ServiceProvider.GlobalProvider.GetService(typeof(SVsSolutionBuildManager)) as IVsSolutionBuildManager2;
+            if (_solutionBuildManager != null)
+            {
+                _solutionBuildManager.AdviseUpdateSolutionEvents(this, out _updateSolutionEventsCookie);
+            }
+        }
+
+        private void UnsubscribeUpdateSolutionEvents()
+        {
+            if (_solutionBuildManager != null)
+            {
+                if (_updateSolutionEventsCookie != 0)
+                {
+                    _solutionBuildManager.UnadviseUpdateSolutionEvents(_updateSolutionEventsCookie);
+                    _updateSolutionEventsCookie = 0;
+                }
+
+                _solutionBuildManager = null;
+            }
+        }
+
+        public int UpdateSolution_Begin(ref int pfCancelUpdate)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int UpdateSolution_Done(int fSucceeded, int fModified, int fCancelCommand)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int UpdateSolution_StartUpdate(ref int pfCancelUpdate)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int UpdateSolution_Cancel()
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnActiveProjectCfgChange(IVsHierarchy pIVsHierarchy)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int UpdateProjectCfg_Begin(IVsHierarchy pHierProj, IVsCfg pCfgProj, IVsCfg pCfgSln, uint dwAction, ref int pfCancel)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int UpdateProjectCfg_Done(IVsHierarchy pHierProj, IVsCfg pCfgProj, IVsCfg pCfgSln, uint dwAction, int fSuccess, int fCancel)
+        {
+            return VSConstants.S_OK;
         }
 
         #endregion
