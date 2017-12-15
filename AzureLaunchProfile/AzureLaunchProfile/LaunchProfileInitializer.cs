@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.ProductionDebug.LaunchProfile
     [AppliesTo(ProjectCapabilities.DotNetCoreWeb)]
     internal sealed class LaunchProfileInitializer : OnceInitializedOnceDisposed, IProjectDynamicLoadComponent
     {
+        public const string LaunchProfileCommandName = "SnapshotDebugger";
         private const string ActiveDebugProfile = "ActiveDebugProfile";
 
         private readonly ILaunchSettingsProvider _launchSettingsProvider;
@@ -121,8 +122,8 @@ namespace Microsoft.VisualStudio.ProductionDebug.LaunchProfile
 
             return new LaunchProfile
             {
-                Name = Resources.SnapshotDebuggerLaunchProfileName,
-                CommandName = Resources.SnapshotDebuggerLaunchProfilerCmdName,
+                Name = Resources.LaunchProfileName,
+                CommandName = LaunchProfileCommandName,
                 LaunchBrowser = activeDebugProfile != null ? activeDebugProfile.LaunchBrowser : true,
                 LaunchUrl = activeDebugProfile?.LaunchUrl,
                 OtherSettings = ImmutableDictionary<string, object>.Empty,

@@ -63,18 +63,18 @@ namespace Microsoft.VisualStudio.ProductionDebug.LaunchProfile {
         /// <summary>
         ///   Looks up a localized string similar to Azure App Service (Snapshot Debugger).
         /// </summary>
-        public static string SnapshotDebuggerLaunchProfileName {
+        public static string LaunchProfileName {
             get {
-                return ResourceManager.GetString("SnapshotDebuggerLaunchProfileName", resourceCulture);
+                return ResourceManager.GetString("LaunchProfileName", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Snapshot Debugger.
         /// </summary>
-        public static string SnapshotDebuggerLaunchProfilerCmdName {
+        public static string LaunchProfileUIFriendlyName {
             get {
-                return ResourceManager.GetString("SnapshotDebuggerLaunchProfilerCmdName", resourceCulture);
+                return ResourceManager.GetString("LaunchProfileUIFriendlyName", resourceCulture);
             }
         }
     }

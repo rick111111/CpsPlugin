@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.ProductionDebug.LaunchProfile
 
         internal static bool IsSnapshotDebuggerProfile(this ILaunchProfile launchProfile)
         {
-            return StringComparer.OrdinalIgnoreCase.Equals(launchProfile?.CommandName, Resources.SnapshotDebuggerLaunchProfilerCmdName);
+            return StringComparer.OrdinalIgnoreCase.Equals(launchProfile?.CommandName, LaunchProfileInitializer.LaunchProfileCommandName);
         }
     }
 }

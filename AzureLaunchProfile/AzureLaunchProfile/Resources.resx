@@ -117,10 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SnapshotDebuggerLaunchProfileName" xml:space="preserve">
+  <data name="LaunchProfileName" xml:space="preserve">
     <value>Azure App Service (Snapshot Debugger)</value>
   </data>
-  <data name="SnapshotDebuggerLaunchProfilerCmdName" xml:space="preserve">
+  <data name="LaunchProfileUIFriendlyName" xml:space="preserve">
     <value>Snapshot Debugger</value>
   </data>
 </root>
