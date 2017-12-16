@@ -16,6 +16,8 @@ namespace DesktopProjectDebug
     [Guid("3F1E4810-F43A-47EF-8294-7978848C45B3")]
     public partial class PropertyPage : UserControl, IPropertyPage
     {
+        private IPropertyPageSite _site = null;
+
         public PropertyPage()
         {
             InitializeComponent();
@@ -23,6 +25,7 @@ namespace DesktopProjectDebug
 
         public void SetPageSite(IPropertyPageSite pPageSite)
         {
+            _site = pPageSite;
         }
 
         public void Activate(IntPtr hWndParent, RECT[] pRect, int bModal)
@@ -89,7 +92,32 @@ namespace DesktopProjectDebug
 
         public int TranslateAccelerator(MSG[] pMsg)
         {
-            return 0;
+            if (pMsg == null)
+                return VSConstants.E_POINTER;
+
+            Message m = Message.Create(pMsg[0].hwnd, (int)pMsg[0].message, pMsg[0].wParam, pMsg[0].lParam);
+            bool used = false;
+
+            // Preprocessing should be passed to the control whose handle the message refers to.
+            Control target = Control.FromChildHandle(m.HWnd);
+            if (target != null)
+                used = target.PreProcessMessage(ref m);
+
+            if (used)
+            {
+                pMsg[0].message = (uint)m.Msg;
+                pMsg[0].wParam = m.WParam;
+                pMsg[0].lParam = m.LParam;
+                // Returning S_OK indicates we handled the message ourselves
+                return VSConstants.S_OK;
+            }
+
+
+            // Returning S_FALSE indicates we have not handled the message
+            int result = 0;
+            if (this._site != null)
+                result = _site.TranslateAccelerator(pMsg);
+            return result;
         }
     }
 }
