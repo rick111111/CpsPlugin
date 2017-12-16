@@ -1,0 +1,14 @@
+[$RootKey$\CLSID\{3F1E4810-F43A-47EF-8294-7978848C45B3}]
+@="DesktopProjectDebug.PropertyPage"
+"Assembly"="DesktopProjectDebug, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c0709845dec550c4"
+"Class"="DesktopProjectDebug.PropertyPage"
+"InprocServer32"="$System$\mscoree.dll"
+"ThreadingModel"="Both"
+
+[$RootKey$\RuntimeConfiguration\dependentAssembly\codeBase\{B2B6E92B-63B5-4FE8-91F7-2C31ABDD7D08}]
+"Name"="DesktopProjectDebug"
+"PublicKeyToken"="c0709845dec550c4"
+"Culture"="neutral"
+"Version"="1.0.0.0"
+"CodeBase"="$PackageFolder$\DesktopProjectDebug.dll"
+
