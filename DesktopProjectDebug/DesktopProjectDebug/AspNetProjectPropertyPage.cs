@@ -9,9 +9,12 @@ using HwndSource = System.Windows.Interop.HwndSource;
 
 namespace DesktopProjectDebug
 {
-    [Guid("3F1E4810-F43A-47EF-8294-7978848C45B3")]
+    [Guid(PropertyPageGuidString)]
     public class AspNetProjectPropertyPage : IPropertyPage
     {
+        public const string PropertyPageGuidString = "3F1E4810-F43A-47EF-8294-7978848C45B3";
+        public static Guid PropertyPageGuid = new Guid(PropertyPageGuidString);
+
         private const int WM_SETFOCUS = 0x0007;
         private const int WM_GETDLGCODE = 0x0087;
         private const int DLGC_WANTARROWS = 0x0001;
@@ -36,8 +39,7 @@ namespace DesktopProjectDebug
 
         public void SetPageSite(IPropertyPageSite pageSite)
         {
-            Assumes.ThrowIfNull(pageSite, nameof(pageSite));
-
+            // pageSite value will be null on clean up
             _pageSite = pageSite;
         }
 
@@ -88,7 +90,7 @@ namespace DesktopProjectDebug
 
             PROPPAGEINFO newPageInfo = new PROPPAGEINFO();
             newPageInfo.cb = (uint)Marshal.SizeOf(typeof(PROPPAGEINFO));
-            newPageInfo.pszTitle = "Snapshot Debugger Configuration";
+            newPageInfo.pszTitle = Resources.DebugPropertyPageTitle;
             newPageInfo.SIZE.cx = (int)PropertyPageControl.Width;
             newPageInfo.SIZE.cy = (int)PropertyPageControl.Height;
             newPageInfo.pszDocString = null;
@@ -148,7 +150,6 @@ namespace DesktopProjectDebug
                 _controlToFocus = controlToFocus;
             }
 
-            /// <inheritdoc />
             protected override void WndProc(ref System.Windows.Forms.Message m)
             {
                 if (m.Msg == WM_SETFOCUS)

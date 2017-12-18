@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 namespace DesktopProjectDebug
 {
     [ComVisible(false)]
-    internal class DebuggableProjectCfg :
+    internal class DebuggableProjectConfig :
         IVsDebuggableProjectCfg,
         IVsDebuggableProjectCfg2,
         IVsQueryDebuggableProjectCfg
@@ -19,15 +19,19 @@ namespace DesktopProjectDebug
         private string _exeNameToLaunch;
         Guid CLSID_ComPlusOnlyDebugEngine4 = new Guid("{FB0D4648-F776-4980-95F8-BB7F36EBC1EE}");
 
-        public DebuggableProjectCfg(IVsHierarchy project, string exeNameToLaunch)
+        internal SnapshotDebugConfig SnapshotDebugConfig { get; set; }
+
+        public DebuggableProjectConfig(IVsHierarchy project, string exeNameToLaunch)
         {
             _project = project;
             _exeNameToLaunch = exeNameToLaunch;
+
+            SnapshotDebugConfig = new SnapshotDebugConfig("", "", "");
         }
 
         public virtual int get_DisplayName(out string name)
         {
-            name = "Debug";
+            name = "Snapshot Debugger Debuggable Project Config";
             return VSConstants.S_OK;
         }
 

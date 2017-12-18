@@ -56,7 +56,7 @@
   <ItemGroup>
     <Compile Include="AspNetProjectPropertyPage.cs" />
     <Compile Include="Assumes.cs" />
-    <Compile Include="DebuggableProjectCfg.cs" />
+    <Compile Include="DebuggableProjectConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Archieve\PropertyPage.cs">
       <SubType>UserControl</SubType>
@@ -71,8 +71,16 @@
     <Compile Include="Archieve\PropertyPageWpf.xaml.cs">
       <DependentUpon>PropertyPageWpf.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SnapshotDebugConfiguration.cs" />
-    <Compile Include="TestDebuggerExtension.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SnapshotDebugConfigDialog.xaml.cs">
+      <DependentUpon>SnapshotDebugConfigDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SnapshotDebugConfig.cs" />
+    <Compile Include="WebProjectDebuggerExtension.cs" />
     <Compile Include="VSPackage1.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -220,6 +228,10 @@
     <EmbeddedResource Include="Archieve\PropertyPage.resx">
       <DependentUpon>PropertyPage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
@@ -231,6 +243,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Archieve\PropertyPageWpf.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SnapshotDebugConfigDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

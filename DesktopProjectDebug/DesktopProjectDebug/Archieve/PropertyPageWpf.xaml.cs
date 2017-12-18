@@ -25,7 +25,7 @@ namespace DesktopProjectDebug
         private DialogPageElementHost _elementHost;
         private UIElement _firstStackPanelChild;
         private UIElement lastStackPanelChild;
-        private SnapshotDebugConfiguration configuration = new SnapshotDebugConfiguration();
+        private SnapshotDebugConfig configuration = new SnapshotDebugConfig();
 
         public PropertyPageWpf()
         {
