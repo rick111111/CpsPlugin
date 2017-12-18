@@ -54,6 +54,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Assumes.cs" />
     <Compile Include="DebuggableProjectCfg.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyPage.cs">
@@ -62,9 +63,11 @@
     <Compile Include="PropertyPage.Designer.cs">
       <DependentUpon>PropertyPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="PropertyPageViewModel.cs" />
     <Compile Include="PropertyPageWpf.xaml.cs">
       <DependentUpon>PropertyPageWpf.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SnapshotDebugConfiguration.cs" />
     <Compile Include="TestDebuggerExtension.cs" />
     <Compile Include="VSPackage1.cs" />
   </ItemGroup>
@@ -207,6 +210,7 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PropertyPage.resx">

@@ -13,7 +13,6 @@ using System.Runtime.InteropServices;
 
 namespace DesktopProjectDebug
 {
-    [Guid("3F1E4810-F43A-47EF-8294-7978848C45B3")]
     public partial class PropertyPage : UserControl, IPropertyPage
     {
         private IPropertyPageSite _site = null;
