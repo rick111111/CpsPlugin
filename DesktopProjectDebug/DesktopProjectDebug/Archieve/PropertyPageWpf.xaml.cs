@@ -1,19 +1,11 @@
 ﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms.Integration;
 using System.Windows.Input;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using HwndSource = System.Windows.Interop.HwndSource;
 
 namespace DesktopProjectDebug
@@ -21,7 +13,6 @@ namespace DesktopProjectDebug
     /// <summary>
     /// Interaction logic for PropertyPageWpf.xaml
     /// </summary>
-    [Guid("3F1E4810-F43A-47EF-8294-7978848C45B3")]
     public partial class PropertyPageWpf : UserControl, IPropertyPage
     {
         private const int WM_SETFOCUS = 0x0007;
@@ -30,9 +21,9 @@ namespace DesktopProjectDebug
         private const int DLGC_WANTTAB = 0x0002;
         private const int DLGC_WANTCHARS = 0x0080;
 
-        private IPropertyPageSite pageSite;
-        private DialogPageElementHost elementHost;
-        private UIElement firstStackPanelChild;
+        private IPropertyPageSite _pageSite;
+        private DialogPageElementHost _elementHost;
+        private UIElement _firstStackPanelChild;
         private UIElement lastStackPanelChild;
         private SnapshotDebugConfiguration configuration = new SnapshotDebugConfiguration();
 
@@ -44,16 +35,16 @@ namespace DesktopProjectDebug
             this.DataContext = new PropertyPageViewModel();
         }
 
-        public void SetPageSite(IPropertyPageSite pPageSite)
+        public void SetPageSite(IPropertyPageSite pageSite)
         {
-            pageSite = pPageSite;
+            _pageSite = pageSite;
         }
 
-        public void Activate(IntPtr hWndParent, RECT[] rect, int bModal)
+        public void Activate(IntPtr hWndParent, RECT[] rect, int modal)
         {
             Assumes.ThrowIfNull(rect, nameof(rect));
 
-            elementHost = new DialogPageElementHost(selectedAppServiceTextBox)
+            _elementHost = new DialogPageElementHost(selectedAppServiceTextBox)
             {
                 Child = this,
                 Left = rect[0].left,
@@ -62,7 +53,7 @@ namespace DesktopProjectDebug
                 Height = rect[0].bottom - rect[0].top
             };
 
-            SetParent((int)this.elementHost.Handle, (int)hWndParent);
+            SetParent((int)_elementHost.Handle, (int)hWndParent);
 
             var hwndSource = HwndSource.FromVisual(this) as HwndSource;
             if (hwndSource != null)
@@ -75,8 +66,8 @@ namespace DesktopProjectDebug
             // Note: System.Linq doesn't work on a UIElementCollection
             foreach (UIElement child in rootPanel.Children)
             {
-                if (firstStackPanelChild == null)
-                    firstStackPanelChild = child;
+                if (_firstStackPanelChild == null)
+                    _firstStackPanelChild = child;
                 lastStackPanelChild = child;
             }
         }
@@ -89,15 +80,15 @@ namespace DesktopProjectDebug
                 hwndSource.RemoveHook(this.HwndSourceHook);
             }
 
-            if (elementHost != null)
+            if (_elementHost != null)
             {
-                elementHost.Child = null;
-                elementHost.Dispose();
-                elementHost = null;
+                _elementHost.Child = null;
+                _elementHost.Dispose();
+                _elementHost = null;
             }
 
             configuration = null;
-            pageSite = null;
+            _pageSite = null;
         }
 
         public void GetPageInfo(PROPPAGEINFO[] pageInfo)
@@ -128,9 +119,9 @@ namespace DesktopProjectDebug
         {
             Assumes.ThrowIfNull(rect, nameof(rect));
 
-            elementHost.Width = rect[0].right - rect[0].left;
-            elementHost.Height = rect[0].bottom - rect[0].top;
-            elementHost.Location = new System.Drawing.Point(rect[0].left, rect[0].top);
+            _elementHost.Width = rect[0].right - rect[0].left;
+            _elementHost.Height = rect[0].bottom - rect[0].top;
+            _elementHost.Location = new System.Drawing.Point(rect[0].left, rect[0].top);
         }
 
         public int IsPageDirty()
@@ -147,9 +138,9 @@ namespace DesktopProjectDebug
         {
         }
 
-        public int TranslateAccelerator(MSG[] pMsg)
+        public int TranslateAccelerator(MSG[] msg)
         {
-            return pageSite.TranslateAccelerator(pMsg);
+            return _pageSite.TranslateAccelerator(msg);
         }
 
         /// <summary>
@@ -197,7 +188,7 @@ namespace DesktopProjectDebug
                         case Key.Tab:
                             if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
                             {
-                                shouldHandle = currentElement != firstStackPanelChild;
+                                shouldHandle = currentElement != _firstStackPanelChild;
                             }
                             else
                             {
