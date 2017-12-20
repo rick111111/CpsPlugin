@@ -3,6 +3,7 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -33,12 +34,17 @@ namespace DesktopProjectDebug
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
     [Guid(VSPackage1.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-    public sealed class VSPackage1 : Package
+    [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideToolWindow(typeof(ToolWindow1))]
+    public sealed class VSPackage1 : Package, IVsPersistSolutionOpts
     {
         /// <summary>
         /// VSPackage1 GUID string.
         /// </summary>
         public const string PackageGuidString = "f4b0addc-db57-42f6-a914-7136780b51d3";
+
+        internal static SnapshotDebugConfigManager ConfigManager { get; set; } = new SnapshotDebugConfigManager();
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VSPackage1"/> class.
@@ -49,6 +55,8 @@ namespace DesktopProjectDebug
             // any Visual Studio service because at this point the package object is created but
             // not sited yet inside Visual Studio environment. The place to do all the other
             // initialization is the Initialize method.
+
+            base.AddOptionKey(SnapshotDebugConfigManager.ConfigSettingKey);
         }
 
         #region Package Members
@@ -60,8 +68,29 @@ namespace DesktopProjectDebug
         protected override void Initialize()
         {
             base.Initialize();
+            ToolWindow1Command.Initialize(this);
         }
 
         #endregion
+
+        protected override void OnLoadOptions(string key, Stream stream)
+        {
+            if (key == SnapshotDebugConfigManager.ConfigSettingKey)
+            {
+                ConfigManager.LoadConfigSettings(stream);
+            }
+
+            base.OnLoadOptions(key, stream);
+        }
+
+        protected override void OnSaveOptions(string key, Stream stream)
+        {
+            if (key == SnapshotDebugConfigManager.ConfigSettingKey)
+            {
+                ConfigManager.SaveConfigSettings(stream);
+            }
+
+            base.OnSaveOptions(key, stream);
+        }        
     }
 }

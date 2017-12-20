@@ -54,22 +54,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Archieve\AspNetProjectPropertyPage.cs" />
-    <Compile Include="Archieve\AspNetProjectPropertyPage2.cs" />
+    <Compile Include="PropertyPage\AspNetProjectPropertyPage.cs" />
+    <Compile Include="PropertyPage\AspNetProjectPropertyPage2.cs" />
     <Compile Include="Assumes.cs" />
     <Compile Include="DebuggableProjectConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyPageControl.xaml.cs">
       <DependentUpon>PropertyPageControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PropertyPageForm.cs">
+    <Compile Include="PropertyPage\PropertyPageForm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="PropertyPageForm.Designer.cs">
+    <Compile Include="PropertyPage\PropertyPageForm.Designer.cs">
       <DependentUpon>PropertyPageForm.cs</DependentUpon>
     </Compile>
     <Compile Include="PropertyPageViewModel.cs" />
-    <Compile Include="Archieve\PropertyPageWpf.xaml.cs">
+    <Compile Include="PropertyPage\PropertyPageWpf.xaml.cs">
       <DependentUpon>PropertyPageWpf.xaml</DependentUpon>
     </Compile>
     <Compile Include="Resources.Designer.cs">
@@ -81,6 +81,12 @@
       <DependentUpon>SnapshotDebugConfigDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="SnapshotDebugConfig.cs" />
+    <Compile Include="SnapshotDebugConfigManager.cs" />
+    <Compile Include="ToolWindow1.cs" />
+    <Compile Include="ToolWindow1Command.cs" />
+    <Compile Include="ToolWindow1Control.xaml.cs">
+      <DependentUpon>ToolWindow1Control.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WebProjectDebuggerExtension.cs" />
     <Compile Include="VSPackage1.cs" />
   </ItemGroup>
@@ -99,7 +105,11 @@
     </Content>
     <Content Include="FixedWebAppDll\Microsoft.VisualStudio.Web.Application.dll" />
     <Content Include="FixedWebAppDll\Microsoft.VisualStudio.Web.Application.pdb" />
+    <Content Include="Resources\ToolWindow1Command.png" />
     <Content Include="Resources\VSPackage1.ico" />
+    <VSCTCompile Include="VSPackage1.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -226,7 +236,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="PropertyPageForm.resx">
+    <EmbeddedResource Include="PropertyPage\PropertyPageForm.resx">
       <DependentUpon>PropertyPageForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
@@ -243,11 +253,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Archieve\PropertyPageWpf.xaml">
+    <Page Include="PropertyPage\PropertyPageWpf.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SnapshotDebugConfigDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ToolWindow1Control.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
