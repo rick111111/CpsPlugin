@@ -28,7 +28,6 @@ namespace DesktopProjectDebug
 
 
         private IPropertyPageSite _pageSite;
-        private DialogPageElementHost _elementHost;
         private HwndSource _hwndSource;
 
         private PropertyPageControl _propertyPageControl;
@@ -38,7 +37,7 @@ namespace DesktopProjectDebug
             {
                 if (_propertyPageControl == null)
                 {
-                    _propertyPageControl = new PropertyPageControl();
+                    _propertyPageControl = new PropertyPageControl(VSPackage1.ConfigManager);
                 }
                 return _propertyPageControl;
             }

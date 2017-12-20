@@ -12,3 +12,21 @@
 "Version"="1.0.0.0"
 "CodeBase"="$PackageFolder$\DesktopProjectDebug.dll"
 
+[$RootKey$\InstalledProducts\VSPackage1]
+@="#110"
+"Package"="{f4b0addc-db57-42f6-a914-7136780b51d3}"
+"PID"="1.0"
+"ProductDetails"="#112"
+"LogoID"="#400"
+[$RootKey$\Packages\{f4b0addc-db57-42f6-a914-7136780b51d3}]
+@="VSPackage1"
+"InprocServer32"="$WinDir$\SYSTEM32\MSCOREE.DLL"
+"Class"="DesktopProjectDebug.VSPackage1"
+"CodeBase"="$PackageFolder$\DesktopProjectDebug.dll"
+[$RootKey$\AutoLoadPackages\{f1536ef8-92ec-443c-9ed7-fdadf150da82}]
+"{f4b0addc-db57-42f6-a914-7136780b51d3}"=dword:00000000
+[$RootKey$\Menus]
+"{f4b0addc-db57-42f6-a914-7136780b51d3}"=", Menus.ctmenu, 1"
+[$RootKey$\ToolWindows\{e93faa38-5aa7-4086-b6f7-cea374388191}]
+@="{f4b0addc-db57-42f6-a914-7136780b51d3}"
+"Name"="DesktopProjectDebug.ToolWindow1"

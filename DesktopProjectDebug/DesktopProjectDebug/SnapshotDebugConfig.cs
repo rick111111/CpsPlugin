@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace DesktopProjectDebug
 {
+    [Serializable]
+    [DebuggerDisplay("SiteName = {WebsiteName}, ResourceGroup = {ResourceId}")]
     public sealed class SnapshotDebugConfig
     {
         public SnapshotDebugConfig(string subscription = "", string resourceId = "", string websiteName = "")

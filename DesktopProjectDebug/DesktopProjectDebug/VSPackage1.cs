@@ -1,15 +1,9 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Diagnostics;
+﻿using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.Win32;
 
 namespace DesktopProjectDebug
 {
@@ -35,7 +29,7 @@ namespace DesktopProjectDebug
     [Guid(VSPackage1.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(ToolWindow1))]
+    [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     public sealed class VSPackage1 : Package, IVsPersistSolutionOpts
     {
         /// <summary>
@@ -56,7 +50,7 @@ namespace DesktopProjectDebug
             // not sited yet inside Visual Studio environment. The place to do all the other
             // initialization is the Initialize method.
 
-            base.AddOptionKey(SnapshotDebugConfigManager.ConfigSettingKey);
+            base.AddOptionKey(SnapshotDebugUserSettings.UserSettingKey);
         }
 
         #region Package Members
@@ -68,14 +62,13 @@ namespace DesktopProjectDebug
         protected override void Initialize()
         {
             base.Initialize();
-            ToolWindow1Command.Initialize(this);
         }
 
         #endregion
 
         protected override void OnLoadOptions(string key, Stream stream)
         {
-            if (key == SnapshotDebugConfigManager.ConfigSettingKey)
+            if (key == SnapshotDebugUserSettings.UserSettingKey)
             {
                 ConfigManager.LoadConfigSettings(stream);
             }
@@ -85,7 +78,7 @@ namespace DesktopProjectDebug
 
         protected override void OnSaveOptions(string key, Stream stream)
         {
-            if (key == SnapshotDebugConfigManager.ConfigSettingKey)
+            if (key == SnapshotDebugUserSettings.UserSettingKey)
             {
                 ConfigManager.SaveConfigSettings(stream);
             }

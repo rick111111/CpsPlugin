@@ -8,17 +8,11 @@ using System.Windows.Forms.Integration;
 
 namespace DesktopProjectDebug
 {
+    [Guid(PropertyPageGuidString)]
     public class AspNetProjectPropertyPage : IPropertyPage
     {
         public const string PropertyPageGuidString = "3F1E4810-F43A-47EF-8294-7978848C45B3";
         public static Guid PropertyPageGuid = new Guid(PropertyPageGuidString);
-
-        private const int WM_SETFOCUS = 0x0007;
-        private const int WM_KEYDOWN = 0x0100;
-        private const int WM_KEYUP = 0x0101;
-        private const int DLGC_WANTARROWS = 0x0001; 
-        private const int DLGC_WANTTAB = 0x0002;
-        private const int DLGC_WANTCHARS = 0x0080;
 
         private IPropertyPageSite _pageSite;
         private DialogPageElementHost _elementHost;
@@ -30,7 +24,7 @@ namespace DesktopProjectDebug
             {
                 if (_propertyPageControl == null)
                 {
-                    _propertyPageControl = new PropertyPageControl();
+                    _propertyPageControl = new PropertyPageControl(VSPackage1.ConfigManager);
                 }
                 return _propertyPageControl;
             }
@@ -73,7 +67,12 @@ namespace DesktopProjectDebug
                 _elementHost = null;
             }
 
-            _propertyPageControl = null;
+            if (_propertyPageControl != null)
+            {
+                _propertyPageControl.Dispose();
+                _propertyPageControl = null;
+            }
+
             _pageSite = null;
         }
 

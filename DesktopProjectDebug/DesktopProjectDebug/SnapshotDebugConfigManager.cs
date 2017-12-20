@@ -2,36 +2,105 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DesktopProjectDebug
 {
-    internal class SnapshotDebugConfigManager
+    public sealed class SnapshotDebugConfigManager
     {
-        public const string ConfigSettingKey = "SnapShotDebugConfigSetting";
-
         private MRUList<SnapshotDebugConfig> _configList = new MRUList<SnapshotDebugConfig>();
+
+        public event EventHandler ConfigListChanged;
 
         public IReadOnlyCollection<SnapshotDebugConfig> GetConfigList()
         {
             return _configList.GetItems();
         }
 
-        public void SaveConfigSettings(Stream stream)
+        public void PromptForNewConfig()
         {
+            SnapshotDebugConfig config = new SnapshotDebugConfig();
+            SnapshotDebugConfigDialog dialog = new SnapshotDebugConfigDialog(config);
+            dialog.ShowDialog();
 
+            if (dialog.Result)
+            {
+                VisitConfig(config);
+            }
         }
 
-        public void LoadConfigSettings(Stream stream)
+        public void VisitConfig(SnapshotDebugConfig config)
         {
-
+            _configList.VisitItem(config);
+            ConfigListChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private class MRUList<T> where T : class
+        public bool SaveConfigSettings(Stream stream)
+        {
+            Assumes.ThrowIfNull(stream, nameof(stream));
+
+            SnapshotDebugUserSettings userSetting = new SnapshotDebugUserSettings(GetConfigList());
+            if (userSetting.SnapshotDebugConfigList.Count() == 0)
+            {
+                return false;
+            }
+
+            BinaryFormatter formatter = new BinaryFormatter();
+            try
+            {
+                formatter.Serialize(stream, userSetting);
+            }
+            catch (SerializationException e)
+            {
+                Assumes.Fail(e.ToString());
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool LoadConfigSettings(Stream stream)
+        {
+            Assumes.ThrowIfNull(stream, nameof(stream));
+
+            BinaryFormatter formatter = new BinaryFormatter();
+            try
+            {
+                if (stream.Length > 0)
+                {
+                    SnapshotDebugUserSettings userSettings = formatter.Deserialize(stream) as SnapshotDebugUserSettings;
+                    if (SnapshotDebugUserSettings.VersionMatch(userSettings.Version))
+                    {
+                        if (userSettings.SnapshotDebugConfigList != null && userSettings.SnapshotDebugConfigList.Count() > 0)
+                        {
+                            _configList.ResetItems(userSettings.SnapshotDebugConfigList.ToList());
+                            ConfigListChanged?.Invoke(this, EventArgs.Empty);
+                        }
+
+                        return true;
+                    }
+                }
+            }
+            catch (SerializationException e)
+            {
+                Assumes.Fail(e.ToString());
+            }
+
+            return false;
+        }
+
+        private sealed class MRUList<T> where T : class
         {
             private const int MaxLength = 15;
             private List<T> _itemList = new List<T>();
+
+            public void ResetItems(List<T> itemList)
+            {
+                Assumes.ThrowIfNull(itemList, nameof(itemList));
+
+                _itemList = itemList;
+            }
 
             public IReadOnlyCollection<T> GetItems()
             {

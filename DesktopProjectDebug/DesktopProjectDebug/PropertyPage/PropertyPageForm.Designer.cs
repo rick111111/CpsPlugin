@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.propertyPageControl1 = new DesktopProjectDebug.PropertyPageControl();
+            this.propertyPageControl1 = new DesktopProjectDebug.PropertyPageControl(null);
             this.SuspendLayout();
             // 
             // elementHost1
