@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using ElementHost = System.Windows.Forms.Integration.ElementHost;
 
 namespace DesktopProjectDebug
 {

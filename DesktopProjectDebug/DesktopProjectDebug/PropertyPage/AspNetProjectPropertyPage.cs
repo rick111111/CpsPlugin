@@ -3,21 +3,20 @@ using Microsoft.VisualStudio.OLE.Interop;
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Forms.Integration;
-using System.Windows.Input;
-using HwndSource = System.Windows.Interop.HwndSource;
 
 namespace DesktopProjectDebug
 {
-    [Guid(PropertyPageGuidString)]
     public class AspNetProjectPropertyPage : IPropertyPage
     {
         public const string PropertyPageGuidString = "3F1E4810-F43A-47EF-8294-7978848C45B3";
         public static Guid PropertyPageGuid = new Guid(PropertyPageGuidString);
 
         private const int WM_SETFOCUS = 0x0007;
-        private const int WM_GETDLGCODE = 0x0087;
-        private const int DLGC_WANTARROWS = 0x0001;
+        private const int WM_KEYDOWN = 0x0100;
+        private const int WM_KEYUP = 0x0101;
+        private const int DLGC_WANTARROWS = 0x0001; 
         private const int DLGC_WANTTAB = 0x0002;
         private const int DLGC_WANTCHARS = 0x0080;
 
@@ -47,7 +46,7 @@ namespace DesktopProjectDebug
         {
             Assumes.ThrowIfNull(rect, nameof(rect));
 
-            _elementHost = new DialogPageElementHost(PropertyPageControl.FirstElement)
+            _elementHost = new DialogPageElementHost(PropertyPageControl.FirstElement, PropertyPageControl.LastElement)
             {
                 Child = PropertyPageControl,
                 Left = rect[0].left,
@@ -56,23 +55,17 @@ namespace DesktopProjectDebug
                 Height = rect[0].bottom - rect[0].top
             };
 
-            SetParent((int)_elementHost.Handle, (int)hWndParent);
-
-            HwndSource hwndSource = HwndSource.FromVisual(PropertyPageControl) as HwndSource;
-            if (hwndSource != null)
+            var parentControl = Control.FromHandle(hWndParent);
+            if (parentControl != null)
             {
-                hwndSource.AddHook(this.HwndSourceHook);
+                _elementHost.Parent = parentControl;
             }
+
+            SetParent((int)_elementHost.Handle, (int)hWndParent);
         }
 
         public void Deactivate()
         {
-            HwndSource hwndSource = HwndSource.FromVisual(PropertyPageControl) as HwndSource;
-            if (hwndSource != null)
-            {
-                hwndSource.RemoveHook(this.HwndSourceHook);
-            }
-
             if (_elementHost != null)
             {
                 _elementHost.Child = null;
@@ -141,13 +134,15 @@ namespace DesktopProjectDebug
         /// </summary>
         private class DialogPageElementHost : ElementHost
         {
-            private UIElement _controlToFocus;
+            private UIElement _firstElement;
+            private UIElement _lastElement;
 
-            public DialogPageElementHost(UIElement controlToFocus)
+            public DialogPageElementHost(UIElement fistElement, UIElement lastElement)
             {
-                Assumes.ThrowIfNull(controlToFocus, nameof(controlToFocus));
+                Assumes.ThrowIfNull(fistElement, nameof(fistElement));
 
-                _controlToFocus = controlToFocus;
+                _firstElement = fistElement;
+                _lastElement = lastElement;
             }
 
             protected override void WndProc(ref System.Windows.Forms.Message m)
@@ -155,9 +150,9 @@ namespace DesktopProjectDebug
                 if (m.Msg == WM_SETFOCUS)
                 {
                     // If our WPF element host receives focus, just set it to our first element
-                    _controlToFocus.Focus();
+                    _firstElement.Focus();
                     return;
-                }
+                }                
 
                 base.WndProc(ref m);
             }
@@ -165,42 +160,5 @@ namespace DesktopProjectDebug
 
         [DllImport("User32.dll", EntryPoint = "SetParent")]
         internal static extern int SetParent(int windowHandle, int parentWindowHandle);
-
-        private IntPtr HwndSourceHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            // Indicate character, arrow, and tab input should be handled in the WPF control.
-            if (msg == WM_GETDLGCODE)
-            {
-                // Special case up/down and tab/shift tab when on the first or last item
-                bool shouldHandle = true;
-                Key key = KeyInterop.KeyFromVirtualKey(wParam.ToInt32());
-                IInputElement currentElement = Keyboard.FocusedElement;
-                if (currentElement != null)
-                {
-                    switch (key)
-                    {
-                        case Key.Tab:
-                            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-                            {
-                                shouldHandle = currentElement != PropertyPageControl.FirstElement;
-                            }
-                            else
-                            {
-                                shouldHandle = currentElement != PropertyPageControl.LastElement;
-                            }
-                            break;
-                    }
-                }
-
-                if (shouldHandle)
-                {
-                    int dlgCode = DLGC_WANTARROWS | DLGC_WANTCHARS | DLGC_WANTTAB;
-                    handled = true;
-                    return new IntPtr(dlgCode);
-                }
-            }
-
-            return IntPtr.Zero;
-        }
     }
 }

@@ -54,18 +54,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AspNetProjectPropertyPage.cs" />
+    <Compile Include="Archieve\AspNetProjectPropertyPage.cs" />
+    <Compile Include="Archieve\AspNetProjectPropertyPage2.cs" />
     <Compile Include="Assumes.cs" />
     <Compile Include="DebuggableProjectConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Archieve\PropertyPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Archieve\PropertyPage.Designer.cs">
-      <DependentUpon>PropertyPage.cs</DependentUpon>
-    </Compile>
     <Compile Include="PropertyPageControl.xaml.cs">
       <DependentUpon>PropertyPageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PropertyPageForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PropertyPageForm.Designer.cs">
+      <DependentUpon>PropertyPageForm.cs</DependentUpon>
     </Compile>
     <Compile Include="PropertyPageViewModel.cs" />
     <Compile Include="Archieve\PropertyPageWpf.xaml.cs">
@@ -225,8 +226,8 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Archieve\PropertyPage.resx">
-      <DependentUpon>PropertyPage.cs</DependentUpon>
+    <EmbeddedResource Include="PropertyPageForm.resx">
+      <DependentUpon>PropertyPageForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

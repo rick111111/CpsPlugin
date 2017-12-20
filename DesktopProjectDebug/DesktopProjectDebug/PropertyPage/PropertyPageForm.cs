@@ -13,11 +13,16 @@ using System.Runtime.InteropServices;
 
 namespace DesktopProjectDebug
 {
-    public partial class PropertyPage : UserControl, IPropertyPage
+    [Guid(PropertyPageGuidString)]
+    public partial class PropertyPageForm : UserControl, IPropertyPage
     {
+        public const string PropertyPageGuidString = "3F1E4810-F43A-47EF-8294-7978848C45B3";
+        public static Guid PropertyPageGuid = new Guid(PropertyPageGuidString);
+
+        private const int SW_HIDE = 0;
         private IPropertyPageSite _site = null;
 
-        public PropertyPage()
+        public PropertyPageForm()
         {
             InitializeComponent();
         }
@@ -29,7 +34,17 @@ namespace DesktopProjectDebug
 
         public void Activate(IntPtr hWndParent, RECT[] pRect, int bModal)
         {
+            this.SuspendLayout();
+
+            var parentControl = Control.FromHandle(hWndParent);
+            if (parentControl != null)
+            {
+                this.Parent = parentControl;
+            }
+
             Win32Methods.SetParent(this.Handle, hWndParent);
+
+            this.ResumeLayout();
         }
 
         public void Deactivate()
@@ -44,11 +59,13 @@ namespace DesktopProjectDebug
             info.dwHelpContext = 0;
             info.pszDocString = null;
             info.pszHelpFile = null;
-            info.pszTitle = "Desktop Project Debugger";
+            info.pszTitle = Resources.DebugPropertyPageTitle;
             info.SIZE.cx = this.Size.Width;
             info.SIZE.cy = this.Size.Height;
             if (pPageInfo != null && pPageInfo.Length > 0)
+            {
                 pPageInfo[0] = info;
+            }
         }
 
         public void SetObjects(uint cObjects, object[] ppunk)
@@ -58,19 +75,22 @@ namespace DesktopProjectDebug
         public void Show(uint nCmdShow)
         {
             if (nCmdShow != SW_HIDE)
+            {
                 this.Show();
+            }
             else
+            {
                 this.Hide();
+            }
         }
 
-        private const int SW_HIDE = 0;
 
         void IPropertyPage.Move(RECT[] pRect)
         {
             if (pRect == null || pRect.Length <= 0)
                 throw new ArgumentNullException("pRect");
 
-            Microsoft.VisualStudio.OLE.Interop.RECT r = pRect[0];
+            RECT r = pRect[0];
 
             this.Location = new Point(r.left, r.top);
         }
@@ -82,7 +102,7 @@ namespace DesktopProjectDebug
 
         public int Apply()
         {
-            throw new NotImplementedException();
+            return VSConstants.S_OK;
         }
 
         public void Help(string pszHelpDir)
@@ -91,32 +111,7 @@ namespace DesktopProjectDebug
 
         public int TranslateAccelerator(MSG[] pMsg)
         {
-            if (pMsg == null)
-                return VSConstants.E_POINTER;
-
-            Message m = Message.Create(pMsg[0].hwnd, (int)pMsg[0].message, pMsg[0].wParam, pMsg[0].lParam);
-            bool used = false;
-
-            // Preprocessing should be passed to the control whose handle the message refers to.
-            Control target = Control.FromChildHandle(m.HWnd);
-            if (target != null)
-                used = target.PreProcessMessage(ref m);
-
-            if (used)
-            {
-                pMsg[0].message = (uint)m.Msg;
-                pMsg[0].wParam = m.WParam;
-                pMsg[0].lParam = m.LParam;
-                // Returning S_OK indicates we handled the message ourselves
-                return VSConstants.S_OK;
-            }
-
-
-            // Returning S_FALSE indicates we have not handled the message
-            int result = 0;
-            if (this._site != null)
-                result = _site.TranslateAccelerator(pMsg);
-            return result;
+            return VSConstants.S_OK;
         }
     }
 }

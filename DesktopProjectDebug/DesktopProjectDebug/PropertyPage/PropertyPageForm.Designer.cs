@@ -1,6 +1,6 @@
 ﻿namespace DesktopProjectDebug
 {
-    partial class PropertyPage
+    partial class PropertyPageForm
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,30 +28,32 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
+            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
+            this.propertyPageControl1 = new DesktopProjectDebug.PropertyPageControl();
             this.SuspendLayout();
             // 
-            // button1
+            // elementHost1
             // 
-            this.button1.Location = new System.Drawing.Point(45, 54);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
+            this.elementHost1.Location = new System.Drawing.Point(0, 0);
+            this.elementHost1.Name = "elementHost1";
+            this.elementHost1.Size = new System.Drawing.Size(450, 110);
+            this.elementHost1.TabIndex = 0;
+            this.elementHost1.Text = "elementHost1";
+            this.elementHost1.Child = this.propertyPageControl1;
             // 
-            // PropertyPage
+            // PropertyPageForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.button1);
-            this.Name = "PropertyPage";
+            this.Controls.Add(this.elementHost1);
+            this.Name = "PropertyPageForm";
+            this.Size = new System.Drawing.Size(450, 150);
             this.ResumeLayout(false);
-
         }
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Integration.ElementHost elementHost1;
+        private PropertyPageControl propertyPageControl1;
     }
 }

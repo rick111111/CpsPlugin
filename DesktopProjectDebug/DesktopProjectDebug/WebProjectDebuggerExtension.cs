@@ -36,7 +36,7 @@ namespace DesktopProjectDebug
         {
             get
             {
-                return AspNetProjectPropertyPage.PropertyPageGuid.ToString("B");
+                return PropertyPageForm.PropertyPageGuid.ToString("B");
             }
         }
 
@@ -78,7 +78,7 @@ namespace DesktopProjectDebug
             {
                 if (!_debugConfigs.TryGetValue(projectGuid, out var debugConfig))
                 {
-                    debugConfig = new DebuggableProjectConfig(project, "cmd.exe");
+                    debugConfig = new DebuggableProjectConfig();
                     _debugConfigs[projectGuid] = debugConfig;
                 }
 

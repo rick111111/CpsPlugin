@@ -12,26 +12,21 @@ namespace DesktopProjectDebug
     [ComVisible(false)]
     internal class DebuggableProjectConfig :
         IVsDebuggableProjectCfg,
-        IVsDebuggableProjectCfg2,
-        IVsQueryDebuggableProjectCfg
+        IVsDebuggableProjectCfg2
     {
-        private IVsHierarchy _project;
-        private string _exeNameToLaunch;
         Guid CLSID_ComPlusOnlyDebugEngine4 = new Guid("{FB0D4648-F776-4980-95F8-BB7F36EBC1EE}");
 
         internal SnapshotDebugConfig SnapshotDebugConfig { get; set; }
 
-        public DebuggableProjectConfig(IVsHierarchy project, string exeNameToLaunch)
+        public DebuggableProjectConfig()
         {
-            _project = project;
-            _exeNameToLaunch = exeNameToLaunch;
-
             SnapshotDebugConfig = new SnapshotDebugConfig("", "", "");
         }
 
         public virtual int get_DisplayName(out string name)
         {
-            name = "Snapshot Debugger Debuggable Project Config";
+            name = Resources.DebugConfigDisplayName;
+
             return VSConstants.S_OK;
         }
 
@@ -112,33 +107,6 @@ namespace DesktopProjectDebug
         }
 
         /// <summary>
-        /// IVsQueryDebuggableProjectCfg
-        /// Returns the debug launch targets
-        /// </summary>
-        public int QueryDebugTargets(uint grfLaunch, uint cTargets, VsDebugTargetInfo2[] rgDebugTargetInfo, uint[] cActual)
-        {
-            cActual[0] = 1;
-            if (cTargets == 0)
-            {
-                return VSConstants.E_NOTIMPL;
-            }
-
-            VsDebugTargetInfo2 info = new VsDebugTargetInfo2();
-            info.dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
-            info.guidLaunchDebugEngine = CLSID_ComPlusOnlyDebugEngine4;
-
-            // Note. A bug in the debugger will cause a failure if a PID is set but the exe name
-            // is NULL. So we just blindly set it here.
-            info.bstrExe = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), _exeNameToLaunch);
-            info.bstrArg = null;
-            info.bstrCurDir = null;
-            info.LaunchFlags = grfLaunch;
-            rgDebugTargetInfo[0] = info;
-
-            return VSConstants.E_NOTIMPL;
-        }
-
-        /// <summary>
         /// IVsDebuggableProjectCfg
         /// </summary>
         public int DebugLaunch(uint grfLaunch)
@@ -149,7 +117,7 @@ namespace DesktopProjectDebug
 
             // Note. A bug in the debugger will cause a failure if a PID is set but the exe name
             // is NULL. So we just blindly set it here.
-            info.bstrExe = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), _exeNameToLaunch);
+            info.bstrExe = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cmd.exe");
             info.bstrArg = null;
             info.bstrCurDir = null;
             info.LaunchFlags = grfLaunch;

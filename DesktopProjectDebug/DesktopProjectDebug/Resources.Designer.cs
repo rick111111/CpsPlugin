@@ -63,6 +63,15 @@ namespace DesktopProjectDebug {
         /// <summary>
         ///   Looks up a localized string similar to Snapshot Debugger.
         /// </summary>
+        public static string DebugConfigDisplayName {
+            get {
+                return ResourceManager.GetString("DebugConfigDisplayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Snapshot Debugger.
+        /// </summary>
         public static string DebugExtensionTargetMenuCommand {
             get {
                 return ResourceManager.GetString("DebugExtensionTargetMenuCommand", resourceCulture);
