@@ -1,7 +1,7 @@
 [$RootKey$\CLSID\{3F1E4810-F43A-47EF-8294-7978848C45B3}]
-@="DesktopProjectDebug.AspNetProjectPropertyPage"
+@="DesktopProjectDebug.WebProjectPropertyPage"
 "Assembly"="DesktopProjectDebug, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c0709845dec550c4"
-"Class"="DesktopProjectDebug.AspNetProjectPropertyPage"
+"Class"="DesktopProjectDebug.WebProjectPropertyPage"
 "InprocServer32"="$System$\mscoree.dll"
 "ThreadingModel"="Both"
 
@@ -12,21 +12,17 @@
 "Version"="1.0.0.0"
 "CodeBase"="$PackageFolder$\DesktopProjectDebug.dll"
 
-[$RootKey$\InstalledProducts\VSPackage1]
-@="#110"
+[$RootKey$\InstalledProducts\ProductionDebugPackage]
+@="#1110"
 "Package"="{f4b0addc-db57-42f6-a914-7136780b51d3}"
 "PID"="1.0"
-"ProductDetails"="#112"
-"LogoID"="#400"
+"ProductDetails"="#1112"
+"LogoID"="#1400"
 [$RootKey$\Packages\{f4b0addc-db57-42f6-a914-7136780b51d3}]
-@="VSPackage1"
+@="ProductionDebugPackage"
 "InprocServer32"="$WinDir$\SYSTEM32\MSCOREE.DLL"
-"Class"="DesktopProjectDebug.VSPackage1"
+"Class"="DesktopProjectDebug.ProductionDebugPackage"
 "CodeBase"="$PackageFolder$\DesktopProjectDebug.dll"
+
 [$RootKey$\AutoLoadPackages\{f1536ef8-92ec-443c-9ed7-fdadf150da82}]
 "{f4b0addc-db57-42f6-a914-7136780b51d3}"=dword:00000000
-[$RootKey$\Menus]
-"{f4b0addc-db57-42f6-a914-7136780b51d3}"=", Menus.ctmenu, 1"
-[$RootKey$\ToolWindows\{e93faa38-5aa7-4086-b6f7-cea374388191}]
-@="{f4b0addc-db57-42f6-a914-7136780b51d3}"
-"Name"="DesktopProjectDebug.ToolWindow1"

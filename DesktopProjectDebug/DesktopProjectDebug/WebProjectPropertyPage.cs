@@ -1,21 +1,22 @@
 ﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 
 namespace DesktopProjectDebug
 {
     [Guid(PropertyPageGuidString)]
-    public class AspNetProjectPropertyPage : IPropertyPage
+    public class WebProjectPropertyPage : IPropertyPage
     {
         public const string PropertyPageGuidString = "3F1E4810-F43A-47EF-8294-7978848C45B3";
         public static Guid PropertyPageGuid = new Guid(PropertyPageGuidString);
 
         private IPropertyPageSite _pageSite;
-        private DialogPageElementHost _elementHost;
+        private ElementHost _elementHost;
 
         private PropertyPageControl _propertyPageControl;
         internal PropertyPageControl PropertyPageControl
@@ -24,7 +25,7 @@ namespace DesktopProjectDebug
             {
                 if (_propertyPageControl == null)
                 {
-                    _propertyPageControl = new PropertyPageControl(VSPackage1.ConfigManager);
+                    _propertyPageControl = new PropertyPageControl(ProductionDebugPackage.DebugConfigManager);
                 }
                 return _propertyPageControl;
             }
@@ -40,7 +41,7 @@ namespace DesktopProjectDebug
         {
             Assumes.ThrowIfNull(rect, nameof(rect));
 
-            _elementHost = new DialogPageElementHost(PropertyPageControl.FirstElement, PropertyPageControl.LastElement)
+            _elementHost = new ElementHost()
             {
                 Child = PropertyPageControl,
                 Left = rect[0].left,
@@ -92,8 +93,22 @@ namespace DesktopProjectDebug
             pageInfo[0] = newPageInfo;
         }
 
+        /// <summary>
+        /// This will be called before Activate()
+        /// cObjects will be 0 on clean up.
+        /// </summary>
         public void SetObjects(uint cObjects, object[] ppunk)
         {
+            if (cObjects > 0)
+            {
+                foreach (IVsBrowseObject obj in ppunk.OfType<IVsBrowseObject>())
+                {
+                    if (obj.GetProjectItem(out IVsHierarchy vsHierarchy, out uint _) == VSConstants.S_OK && vsHierarchy is IVsProject)
+                    {
+                        PropertyPageControl.ProjectGuid = Utils.GetProjectGuid(vsHierarchy);
+                    }
+                }
+            }
         }
 
         public void Show(uint nCmdShow)
@@ -126,35 +141,6 @@ namespace DesktopProjectDebug
         public int TranslateAccelerator(MSG[] msg)
         {
             return _pageSite.TranslateAccelerator(msg);
-        }
-
-        /// <summary>
-        /// Subclass of ElementHost designed to work around focus issues in native Win32 property page frames
-        /// </summary>
-        private class DialogPageElementHost : ElementHost
-        {
-            private UIElement _firstElement;
-            private UIElement _lastElement;
-
-            public DialogPageElementHost(UIElement fistElement, UIElement lastElement)
-            {
-                Assumes.ThrowIfNull(fistElement, nameof(fistElement));
-
-                _firstElement = fistElement;
-                _lastElement = lastElement;
-            }
-
-            protected override void WndProc(ref System.Windows.Forms.Message m)
-            {
-                if (m.Msg == WM_SETFOCUS)
-                {
-                    // If our WPF element host receives focus, just set it to our first element
-                    _firstElement.Focus();
-                    return;
-                }                
-
-                base.WndProc(ref m);
-            }
         }
 
         [DllImport("User32.dll", EntryPoint = "SetParent")]

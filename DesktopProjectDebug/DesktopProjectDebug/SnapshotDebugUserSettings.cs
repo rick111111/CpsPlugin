@@ -10,12 +10,12 @@ namespace DesktopProjectDebug
 
         public const string UserSettingKey = "SnapshotDebugConfigUserSetting";
 
-        public SnapshotDebugUserSettings(IEnumerable<SnapshotDebugConfig> configs)
+        public SnapshotDebugUserSettings(Dictionary<Guid, IEnumerable<SnapshotDebugConfig>> configs)
         {
             Assumes.ThrowIfNull(configs, nameof(configs));
 
             Version = DefaultVersion;
-            SnapshotDebugConfigList = configs;
+            DebugConfigs = configs;
         }
         
         public static bool VersionMatch(string version)
@@ -25,6 +25,6 @@ namespace DesktopProjectDebug
         
         public string Version { get; }
         
-        public IEnumerable<SnapshotDebugConfig> SnapshotDebugConfigList { get; }
+        public Dictionary<Guid, IEnumerable<SnapshotDebugConfig>> DebugConfigs { get; }
     }
 }

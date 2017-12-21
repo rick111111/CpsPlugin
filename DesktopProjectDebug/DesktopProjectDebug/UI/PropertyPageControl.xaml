@@ -9,7 +9,7 @@
     
     <StackPanel x:Name="rootPanel" Margin="10,10,0,0"
         Orientation="Horizontal" VerticalAlignment="Top">
-        <ComboBox Width="200" x:Name="azureResourceCombo" 
+        <ComboBox Width="200" x:Name="configCombo" 
                   ItemsSource="{Binding SnapshotDebugConfigList, Mode=OneWay}" 
                   DisplayMemberPath="WebsiteName"
                   SelectionChanged="Combo_SelectionChanged"/>

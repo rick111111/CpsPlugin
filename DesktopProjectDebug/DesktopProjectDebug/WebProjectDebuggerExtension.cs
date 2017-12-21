@@ -1,19 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Runtime.Versioning;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Web.Application;
 
 namespace DesktopProjectDebug
 {
+    /// <summary>
+    /// Web Project Extension for Asp.Net Desktop scenario, add launch target and debug option page for snapshot debugging
+    /// </summary>
     [Export(typeof(IWebProjectDebugExtension))]
     [ExportMetadata("Order", 200)]
     internal class WebProjectDebuggerExtension : IWebProjectDebugExtension, IWebProjectDebugExtension2
     {
         private const string ExtensionIdentifier = "SnapshotDebugExtension";
 
+        // create one IVsDebuggableProjectCfg object per project
         private Dictionary<Guid, DebuggableProjectConfig> _debugConfigs = new Dictionary<Guid, DebuggableProjectConfig>();
 
         public string DebugTargetMenuCommand
@@ -36,7 +40,7 @@ namespace DesktopProjectDebug
         {
             get
             {
-                return PropertyPageForm.PropertyPageGuid.ToString("B");
+                return WebProjectPropertyPage.PropertyPageGuid.ToString("B");
             }
         }
 
@@ -49,19 +53,25 @@ namespace DesktopProjectDebug
         {
             if (isActive)
             {
-                DebuggableProjectConfig debugcfg = GetProjectConfig(project);
-
-                if (debugcfg != null)
+                Guid projectGuid = Utils.GetProjectGuid(project);
+                if (projectGuid != Guid.Empty)
                 {
-                    SnapshotDebugConfigDialog dialog = new SnapshotDebugConfigDialog(debugcfg.SnapshotDebugConfig);
-                    dialog.ShowDialog();
+                    // Ensure a debug configuration is created when selecting snapshot debugger debug target
+                    IReadOnlyCollection<SnapshotDebugConfig> configList = ProductionDebugPackage.DebugConfigManager.GetConfigList(projectGuid);
+                    if (configList?.Count() == 0)
+                    {
+                        ProductionDebugPackage.DebugConfigManager.PromptForNewConfig(projectGuid);
+                    }
                 }
             }
         }
 
+        /// <summary>
+        /// Only support desktop CLR version 4.6.1 and above
+        /// </summary>
         public bool IsSupported(IVsHierarchy project)
         {
-            FrameworkName fwname = GetProjectTargetFramework(project);
+            FrameworkName fwname = Utils.GetProjectTargetFramework(project);
             if (fwname != null && fwname.Version.Major >= 4 && fwname.Version.Minor >= 6 && fwname.Version.Build >= 1)
             {
                 return true;
@@ -72,7 +82,7 @@ namespace DesktopProjectDebug
 
         private DebuggableProjectConfig GetProjectConfig(IVsHierarchy project)
         {
-            Guid projectGuid = GetProjectGuid(project);
+            Guid projectGuid = Utils.GetProjectGuid(project);
 
             if (Assumes.Verify(projectGuid != Guid.Empty))
             {
@@ -83,35 +93,6 @@ namespace DesktopProjectDebug
                 }
 
                 return debugConfig;
-            }
-
-            return null;
-        }
-
-        private Guid GetProjectGuid(IVsHierarchy project)
-        {
-            if (Assumes.Verify(project is IVsProject))
-            {
-                int result = project.GetGuidProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ProjectIDGuid, out Guid guid);
-                if (result == VSConstants.S_OK)
-                {
-                    return guid;
-                }
-            }
-
-            return Guid.Empty;
-        }
-
-        private FrameworkName GetProjectTargetFramework(IVsHierarchy project)
-        {
-            if (Assumes.Verify(project is IVsProject))
-            {
-                int result = project.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID4.VSHPROPID_TargetFrameworkMoniker, out object obj);
-                string framework = obj as string;
-                if (result == VSConstants.S_OK && !string.IsNullOrEmpty(framework))
-                {
-                    return new FrameworkName(framework);
-                }
             }
 
             return null;

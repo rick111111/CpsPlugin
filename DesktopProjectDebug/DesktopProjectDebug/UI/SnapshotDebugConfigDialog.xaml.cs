@@ -14,17 +14,15 @@ namespace DesktopProjectDebug
             this.DataContext = config;
         }
 
-        public bool Result { get; private set; }
-
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            Result = true;
+            this.DialogResult = true;
             this.Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            Result = false;
+            this.DialogResult = false;
             this.Close();
         }
     }

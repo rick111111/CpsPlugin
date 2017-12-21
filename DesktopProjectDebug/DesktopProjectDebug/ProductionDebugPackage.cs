@@ -25,25 +25,21 @@ namespace DesktopProjectDebug
     /// </para>
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
-    [Guid(VSPackage1.PackageGuidString)]
+    [InstalledProductRegistration("#1110", "#1112", "1.0", IconResourceID = 1400)] // Info on this package for Help/About
+    [Guid(ProductionDebugPackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-    [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
-    public sealed class VSPackage1 : Package, IVsPersistSolutionOpts
+    public sealed class ProductionDebugPackage : Package
     {
         /// <summary>
-        /// VSPackage1 GUID string.
+        /// ProductionDebugPackage GUID string.
         /// </summary>
         public const string PackageGuidString = "f4b0addc-db57-42f6-a914-7136780b51d3";
-
-        internal static SnapshotDebugConfigManager ConfigManager { get; set; } = new SnapshotDebugConfigManager();
-
-
+        
         /// <summary>
-        /// Initializes a new instance of the <see cref="VSPackage1"/> class.
+        /// Initializes a new instance of the <see cref="ProductionDebugPackage"/> class.
         /// </summary>
-        public VSPackage1()
+        public ProductionDebugPackage()
         {
             // Inside this method you can place any initialization code that does not require
             // any Visual Studio service because at this point the package object is created but
@@ -66,11 +62,13 @@ namespace DesktopProjectDebug
 
         #endregion
 
+        internal static SnapshotDebugConfigManager DebugConfigManager { get; set; } = new SnapshotDebugConfigManager();
+
         protected override void OnLoadOptions(string key, Stream stream)
         {
             if (key == SnapshotDebugUserSettings.UserSettingKey)
             {
-                ConfigManager.LoadConfigSettings(stream);
+                DebugConfigManager.LoadConfigSettings(stream);
             }
 
             base.OnLoadOptions(key, stream);
@@ -80,10 +78,10 @@ namespace DesktopProjectDebug
         {
             if (key == SnapshotDebugUserSettings.UserSettingKey)
             {
-                ConfigManager.SaveConfigSettings(stream);
+                DebugConfigManager.SaveConfigSettings(stream);
             }
 
             base.OnSaveOptions(key, stream);
-        }        
+        }
     }
 }

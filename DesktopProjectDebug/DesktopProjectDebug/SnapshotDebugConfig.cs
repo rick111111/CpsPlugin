@@ -7,7 +7,12 @@ namespace DesktopProjectDebug
     [DebuggerDisplay("SiteName = {WebsiteName}, ResourceGroup = {ResourceId}")]
     public sealed class SnapshotDebugConfig
     {
-        public SnapshotDebugConfig(string subscription = "", string resourceId = "", string websiteName = "")
+        public SnapshotDebugConfig()
+            : this(string.Empty, string.Empty, string.Empty)
+        {
+        }
+
+        public SnapshotDebugConfig(string subscription, string resourceId, string websiteName)
         {
             Subscription = subscription;
             ResourceId = resourceId;
@@ -35,14 +40,28 @@ namespace DesktopProjectDebug
         {
             return Subscription.GetHashCode() ^ ResourceId.GetHashCode() ^ WebsiteName.GetHashCode();
         }
+
         public static bool operator ==(SnapshotDebugConfig c1, SnapshotDebugConfig c2)
         {
+            if (ReferenceEquals(c1, c2))
+            {
+                return true;
+            }
+            if (ReferenceEquals(c1, null))
+            {
+                return false;
+            }
+            if (ReferenceEquals(c2, null))
+            {
+                return false;
+            }
+
             return c1.Equals(c2);
         }
 
         public static bool operator !=(SnapshotDebugConfig c1, SnapshotDebugConfig c2)
         {
-            return !c1.Equals(c2);
+            return !(c1 == c2);
         }
     }
 }

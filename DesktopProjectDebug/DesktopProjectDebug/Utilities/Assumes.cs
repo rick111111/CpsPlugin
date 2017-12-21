@@ -20,6 +20,16 @@ namespace DesktopProjectDebug
             return condition;
         }
 
+        public static bool Verify(bool condition, string msg)
+        {
+            if (!condition)
+            {
+                throw new Exception(msg);
+            }
+
+            return condition;
+        }
+
         public static void ThrowIfNull(object obj, string msg)
         {
             if (obj == null)

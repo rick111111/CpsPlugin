@@ -9,39 +9,65 @@ namespace DesktopProjectDebug
 {
     public sealed class SnapshotDebugConfigManager
     {
-        private MRUList<SnapshotDebugConfig> _configList = new MRUList<SnapshotDebugConfig>();
+        /// <summary>
+        /// Maintains one MRU list per project
+        /// </summary>
+        private Dictionary<Guid, MRUList<SnapshotDebugConfig>> _mruDictionary = new Dictionary<Guid, MRUList<SnapshotDebugConfig>>();
 
-        public event EventHandler ConfigListChanged;
+        public event EventHandler<IEnumerable<Guid>> ConfigListChanged;
 
-        public IReadOnlyCollection<SnapshotDebugConfig> GetConfigList()
+        public IReadOnlyCollection<SnapshotDebugConfig> GetConfigList(Guid projectGuid)
         {
-            return _configList.GetItems();
+            return GetMRUList(projectGuid)?.GetItems() ?? new List<SnapshotDebugConfig>();
         }
 
-        public void PromptForNewConfig()
+        public SnapshotDebugConfig PromptForNewConfig(Guid projectGuid)
         {
             SnapshotDebugConfig config = new SnapshotDebugConfig();
             SnapshotDebugConfigDialog dialog = new SnapshotDebugConfigDialog(config);
-            dialog.ShowDialog();
-
-            if (dialog.Result)
+            if (dialog.ShowDialog() == true)
             {
-                VisitConfig(config);
+                VisitConfig(projectGuid, config);
             }
+
+            return config;
         }
 
-        public void VisitConfig(SnapshotDebugConfig config)
+        /// <summary>
+        /// Update MRU list when user visit a configuration or created a new configuration
+        /// </summary>
+        public void VisitConfig(Guid projectGuid, SnapshotDebugConfig config)
         {
-            _configList.VisitItem(config);
-            ConfigListChanged?.Invoke(this, EventArgs.Empty);
+            MRUList<SnapshotDebugConfig> mruList = GetMRUList(projectGuid);
+            mruList.VisitItem(config);
+
+            ConfigListChanged?.Invoke(this, new Guid[] { projectGuid });
         }
 
+        private MRUList<SnapshotDebugConfig> GetMRUList(Guid projectGuid)
+        {
+            MRUList<SnapshotDebugConfig> mruList;
+            if (!_mruDictionary.TryGetValue(projectGuid, out mruList))
+            {
+                mruList = new MRUList<SnapshotDebugConfig>();
+                _mruDictionary[projectGuid] = mruList;
+            }
+
+            return mruList;
+        }
+
+        /// <summary>
+        /// Save snapshot debug setting into stream
+        /// </summary>
         public bool SaveConfigSettings(Stream stream)
         {
             Assumes.ThrowIfNull(stream, nameof(stream));
 
-            SnapshotDebugUserSettings userSetting = new SnapshotDebugUserSettings(GetConfigList());
-            if (userSetting.SnapshotDebugConfigList.Count() == 0)
+            Dictionary<Guid, IEnumerable<SnapshotDebugConfig>> configs = _mruDictionary.
+                ToDictionary(p => p.Key, p => p.Value.GetItems() as IEnumerable<SnapshotDebugConfig>);
+
+            SnapshotDebugUserSettings userSetting = new SnapshotDebugUserSettings(configs);
+            if (userSetting.DebugConfigs.Count() == 0)
             {
                 return false;
             }
@@ -60,6 +86,9 @@ namespace DesktopProjectDebug
             return true;
         }
 
+        /// <summary>
+        /// Load snapshot debug setting from stream
+        /// </summary>
         public bool LoadConfigSettings(Stream stream)
         {
             Assumes.ThrowIfNull(stream, nameof(stream));
@@ -70,12 +99,14 @@ namespace DesktopProjectDebug
                 if (stream.Length > 0)
                 {
                     SnapshotDebugUserSettings userSettings = formatter.Deserialize(stream) as SnapshotDebugUserSettings;
-                    if (SnapshotDebugUserSettings.VersionMatch(userSettings.Version))
+                    if (SnapshotDebugUserSettings.VersionMatch(userSettings?.Version))
                     {
-                        if (userSettings.SnapshotDebugConfigList != null && userSettings.SnapshotDebugConfigList.Count() > 0)
+                        if (userSettings.DebugConfigs?.Count() > 0)
                         {
-                            _configList.ResetItems(userSettings.SnapshotDebugConfigList.ToList());
-                            ConfigListChanged?.Invoke(this, EventArgs.Empty);
+                            _mruDictionary = userSettings.DebugConfigs.ToDictionary(p => p.Key, p => new MRUList<SnapshotDebugConfig>(p.Value.ToList()));
+
+                            // Guid.empty means all MRU lists are changed
+                            ConfigListChanged?.Invoke(this, _mruDictionary.Select(p => p.Key));
                         }
 
                         return true;
@@ -90,31 +121,44 @@ namespace DesktopProjectDebug
             return false;
         }
 
+        /// <summary>
+        /// Basic MRU list implementation
+        /// </summary>
         private sealed class MRUList<T> where T : class
         {
-            private const int MaxLength = 15;
-            private List<T> _itemList = new List<T>();
+            private const int MaxLength = 10;
+            private List<T> _itemList;
+            private object _lockObject = new object();
 
-            public void ResetItems(List<T> itemList)
+            public MRUList()
             {
-                Assumes.ThrowIfNull(itemList, nameof(itemList));
+                _itemList = new List<T>();
+            }
 
-                _itemList = itemList;
+            public MRUList(List<T> lt)
+            {
+                _itemList = lt;
             }
 
             public IReadOnlyCollection<T> GetItems()
             {
-                return _itemList;
+                lock (_lockObject)
+                {
+                    return _itemList;
+                }
             }
 
             public void VisitItem(T item)
             {
-                _itemList.Remove(item);
-                _itemList.Insert(0, item);
-
-                while (_itemList.Count > MaxLength)
+                lock (_lockObject)
                 {
-                    _itemList.RemoveAt(_itemList.Count - 1);
+                    _itemList.Remove(item);
+                    _itemList.Insert(0, item);
+
+                    while (_itemList.Count > MaxLength)
+                    {
+                        _itemList.RemoveAt(_itemList.Count - 1);
+                    }
                 }
             }
         }
