@@ -1,0 +1,12 @@
+[$RootKey$\CLSID\{3F1E4810-F43A-47EF-8294-7978848C45B3}]
+@="Microsoft.VisualStudio.Debugger.Parallel.Extension.WebProjectPropertyPage"
+"Assembly"="PdtExtensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c0709845dec550c4"
+"Class"="Microsoft.VisualStudio.Debugger.Parallel.Extension.WebProjectPropertyPage"
+"InprocServer32"="$System$\mscoree.dll"
+"ThreadingModel"="Both"
+
+[$RootKey$\RuntimeConfiguration\dependentAssembly\codeBase\{25F45425-D54C-48EF-8422-8CC4B589EEA8}]
+"name"="PdtExtensions"
+"codeBase"="PdtExtensions.dll"
+"publicKeyToken"="c0709845dec550c4"
+"culture"="neutral"
