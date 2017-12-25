@@ -60,6 +60,7 @@
     <Compile Include="PropertyPageControl.xaml.cs">
       <DependentUpon>PropertyPageControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PropertyPageViewModel.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -68,6 +69,7 @@
     <Compile Include="SnapshotDebugConfig.cs" />
     <Compile Include="SnapshotDebugConfigManager.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="ViewModelBase.cs" />
     <Compile Include="WebProjectDebuggerExtension.cs" />
     <Compile Include="WebProjectPropertyPage.cs" />
   </ItemGroup>
@@ -96,6 +98,7 @@
     <Reference Include="Microsoft.VisualStudio.CommandBars, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.CoreUtility.15.0.26201\lib\net45\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
       <Private>True</Private>
@@ -103,6 +106,7 @@
     <Reference Include="Microsoft.VisualStudio.Debugger.Interop.Internal, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Reference\Microsoft.VisualStudio.Debugger.Interop.Internal.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Imaging, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Imaging.15.0.26201\lib\net45\Microsoft.VisualStudio.Imaging.dll</HintPath>
@@ -168,15 +172,19 @@
     <Reference Include="Microsoft.VisualStudio.Web.Application, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Reference\Microsoft.VisualStudio.Web.Application.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Web.WindowsAzure.CommonContracts">
       <HintPath>Reference\Microsoft.VisualStudio.Web.WindowsAzure.CommonContracts.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.WindowsAzure.MicrosoftWeb">
       <HintPath>Reference\Microsoft.VisualStudio.WindowsAzure.MicrosoftWeb.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Client.Contracts.2.8">
       <HintPath>Reference\Microsoft.WindowsAzure.Client.Contracts.2.8.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

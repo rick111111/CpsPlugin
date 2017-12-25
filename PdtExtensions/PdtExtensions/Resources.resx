@@ -123,6 +123,9 @@
   <data name="AppServiceDialogTitle" xml:space="preserve">
     <value>App Service</value>
   </data>
+  <data name="AppServiceSelectionHyperlink" xml:space="preserve">
+    <value>Click to Select App Service</value>
+  </data>
   <data name="DebugConfigDisplayName" xml:space="preserve">
     <value>Snapshot Debugger</value>
   </data>

@@ -1,6 +1,9 @@
-﻿using Microsoft.VisualStudio.OLE.Interop;
+﻿using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -17,18 +20,12 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
         private IPropertyPageSite _pageSite;
         private ElementHost _elementHost;
 
-        private PropertyPageControl _propertyPageControl;
-        internal PropertyPageControl PropertyPageControl
-        {
-            get
-            {
-                if (_propertyPageControl == null)
-                {
-                    _propertyPageControl = new PropertyPageControl();
-                }
-                return _propertyPageControl;
-            }
-        }
+        private Guid _projectGuid;
+        private PropertyPageControl _propertyPageControl = new PropertyPageControl();
+        private PropertyPageViewModel _propertyPageViewModel;
+
+        [Import]
+        private ISnapshotDebugConfigManager _snapshotDebugConfigManager = null;
 
         public void SetPageSite(IPropertyPageSite pageSite)
         {
@@ -40,7 +37,7 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
         {
             _elementHost = new ElementHost()
             {
-                Child = PropertyPageControl,
+                Child = _propertyPageControl,
                 Left = rect[0].left,
                 Top = rect[0].top,
                 Width = rect[0].right - rect[0].left,
@@ -58,6 +55,11 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
 
         public void Deactivate()
         {
+            if (_snapshotDebugConfigManager != null)
+            {
+                _snapshotDebugConfigManager.ConfigurationChanged -= SnapshotDebugConfigManager_ConfigurationChanged;
+            }
+
             if (_elementHost != null)
             {
                 _elementHost.Child = null;
@@ -65,17 +67,17 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
                 _elementHost = null;
             }
 
-            _propertyPageControl = null;
             _pageSite = null;
         }
 
         public void GetPageInfo(PROPPAGEINFO[] pageInfo)
         {
             PROPPAGEINFO newPageInfo = new PROPPAGEINFO();
+
             newPageInfo.cb = (uint)Marshal.SizeOf(typeof(PROPPAGEINFO));
             newPageInfo.pszTitle = Resources.DebugPropertyPageTitle;
-            newPageInfo.SIZE.cx = (int)PropertyPageControl.Width;
-            newPageInfo.SIZE.cy = (int)PropertyPageControl.Height;
+            newPageInfo.SIZE.cx = (int)_propertyPageControl.Width;
+            newPageInfo.SIZE.cy = (int)_propertyPageControl.Height;
             newPageInfo.pszDocString = null;
             newPageInfo.pszHelpFile = null;
             newPageInfo.dwHelpContext = 0;
@@ -91,13 +93,39 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
         {
             if (cObjects > 0)
             {
+                // satisfy mef imports
+                IComponentModel host = ServiceProvider.GlobalProvider.GetService(typeof(SComponentModel)) as IComponentModel;
+                if (host != null)
+                {
+                    host.DefaultCompositionService.SatisfyImportsOnce(this);
+                }
+
                 foreach (IVsBrowseObject obj in ppunk.OfType<IVsBrowseObject>())
                 {
                     if (obj.GetProjectItem(out IVsHierarchy vsHierarchy, out uint _) == VSConstants.S_OK && vsHierarchy is IVsProject)
                     {
-                        PropertyPageControl.ProjectGuid = Utils.GetProjectGuid(vsHierarchy);
+                        _projectGuid = Utils.GetProjectGuid(vsHierarchy);
                     }
                 }
+
+                if (_projectGuid != null && _projectGuid != Guid.Empty && _snapshotDebugConfigManager != null)
+                {
+                    _propertyPageControl.Initialize(_projectGuid, _snapshotDebugConfigManager);
+
+                    SnapshotDebugConfig config = _snapshotDebugConfigManager.GetConfiguration(_projectGuid);
+                    _propertyPageViewModel = new PropertyPageViewModel(config);
+                    _propertyPageControl.DataContext = _propertyPageViewModel;
+
+                    _snapshotDebugConfigManager.ConfigurationChanged += SnapshotDebugConfigManager_ConfigurationChanged;
+                }
+            }
+        }
+
+        private void SnapshotDebugConfigManager_ConfigurationChanged(object sender, Guid e)
+        {
+            if (_projectGuid == e)
+            {
+                _propertyPageViewModel.SetConfiguration(_snapshotDebugConfigManager.GetConfiguration(_projectGuid));
             }
         }
 

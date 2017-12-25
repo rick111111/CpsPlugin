@@ -79,6 +79,15 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Click to Select App Service.
+        /// </summary>
+        internal static string AppServiceSelectionHyperlink {
+            get {
+                return ResourceManager.GetString("AppServiceSelectionHyperlink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Snapshot Debugger.
         /// </summary>
         internal static string DebugConfigDisplayName {
