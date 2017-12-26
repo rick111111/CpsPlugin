@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
         private IPropertyPageSite _pageSite;
         private ElementHost _elementHost;
 
-        private Guid _projectGuid;
+        private Guid _projectGuid = Guid.Empty;
         private PropertyPageControl _propertyPageControl = new PropertyPageControl();
         private PropertyPageViewModel _propertyPageViewModel;
 
@@ -58,6 +58,7 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
             if (_snapshotDebugConfigManager != null)
             {
                 _snapshotDebugConfigManager.ConfigurationChanged -= SnapshotDebugConfigManager_ConfigurationChanged;
+                _snapshotDebugConfigManager = null;
             }
 
             if (_elementHost != null)
@@ -108,7 +109,7 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
                     }
                 }
 
-                if (_projectGuid != null && _projectGuid != Guid.Empty && _snapshotDebugConfigManager != null)
+                if (_snapshotDebugConfigManager != null && _projectGuid != Guid.Empty)
                 {
                     _propertyPageControl.Initialize(_projectGuid, _snapshotDebugConfigManager);
 

@@ -33,25 +33,10 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
             }
         }
 
-        public SnapshotDebugConfig EnsureConfigurationExist(Guid projectGuid)
+        public SnapshotDebugConfig CreateNewConfiguration(Guid projectGuid)
         {
-            SnapshotDebugConfig config = GetConfiguration(projectGuid);
-            if (config == null)
-            {
-                config = PromptForConfiguration(projectGuid);
-                if (config != null)
-                {
-                    _configDictionary[projectGuid] = config;
-                    ConfigurationChanged?.Invoke(this, projectGuid);
-                }
-            }
-
-            return config;
-        }
-
-        private SnapshotDebugConfig PromptForConfiguration(Guid projectGuid)
-        {
-            IAzureServiceSelectionDialog selectionDialog = _azureServiceSelectionDialogFactory.Value?.CreateDialog(AppServiceAssetSelectionParameters.Default,
+            IAzureServiceSelectionDialog selectionDialog = _azureServiceSelectionDialogFactory.Value?.CreateDialog(
+                AppServiceAssetSelectionParameters.Default,
                 new AzureServiceDescription()
                 {
                     Title = Resources.AppServiceDialogTitle,
@@ -61,12 +46,15 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
             if (selectionDialog?.ShowModal() == true)
             {
                 IEntity entity = selectionDialog.Result;
-                return new SnapshotDebugConfig()
+                SnapshotDebugConfig config = new SnapshotDebugConfig()
                 {
                     Subscription = entity.ToString(),
                     ResourceId = entity.Id,
                     WebsiteName = entity.Name
                 };
+
+                _configDictionary[projectGuid] = config;
+                return config;
             }
 
             return null;

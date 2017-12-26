@@ -58,7 +58,11 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
                 Guid projectGuid = Utils.GetProjectGuid(project);
                 if (projectGuid != Guid.Empty)
                 {
-                    _snapshotDebugConfigManager.Value?.EnsureConfigurationExist(projectGuid);
+                    SnapshotDebugConfig config = _snapshotDebugConfigManager.Value?.GetConfiguration(projectGuid);
+                    if (config == null)
+                    {
+                        _snapshotDebugConfigManager.Value?.CreateNewConfiguration(projectGuid);
+                    }
                 }
             }
         }

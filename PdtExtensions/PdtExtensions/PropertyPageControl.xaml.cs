@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
-            _snapshotDebugConfigManager?.EnsureConfigurationExist(_projectGuid);
+            _snapshotDebugConfigManager?.CreateNewConfiguration(_projectGuid);
         }
     }
 }

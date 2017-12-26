@@ -6,8 +6,8 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
     {
         event EventHandler<Guid> ConfigurationChanged;
 
-        SnapshotDebugConfig EnsureConfigurationExist(Guid projectGuid);
-
         SnapshotDebugConfig GetConfiguration(Guid projectGuid);
+
+        SnapshotDebugConfig CreateNewConfiguration(Guid projectGuid);
     }
 }

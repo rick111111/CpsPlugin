@@ -108,11 +108,16 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
         {
             if (_snapshotDebugConfigManager != null)
             {
-                SnapshotDebugConfig config = _snapshotDebugConfigManager.EnsureConfigurationExist(_projectGuid);
-                IProductionDebuggerInternal debugger = ServiceProvider.GlobalProvider.GetService(typeof(SVsShellDebugger)) as IProductionDebuggerInternal;
-                if (config != null && debugger != null)
+                SnapshotDebugConfig config = _snapshotDebugConfigManager.GetConfiguration(_projectGuid);
+                if (config == null)
                 {
-                    debugger.LaunchProductionDebugWithAzureTools(config.ResourceId, config.WebsiteName, config.Subscription);
+                    config = _snapshotDebugConfigManager.CreateNewConfiguration(_projectGuid);
+                }
+
+                if (config != null)
+                {
+                    IProductionDebuggerInternal debugger = ServiceProvider.GlobalProvider.GetService(typeof(SVsShellDebugger)) as IProductionDebuggerInternal;
+                    debugger?.LaunchProductionDebugWithAzureTools(config.ResourceId, config.WebsiteName, config.Subscription);
                 }
             }
            
