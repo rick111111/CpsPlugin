@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Runtime.InteropServices;
+using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
 {
@@ -117,7 +118,18 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
                 if (config != null)
                 {
                     IProductionDebuggerInternal debugger = ServiceProvider.GlobalProvider.GetService(typeof(SVsShellDebugger)) as IProductionDebuggerInternal;
-                    debugger?.LaunchProductionDebugWithAzureTools(config.ResourceId, config.WebsiteName, config.Subscription);
+
+                    Task.Run(async () =>
+                    {
+                        string token = await config.GetBearerToken();
+                        
+                        if (!string.IsNullOrEmpty(token))
+                        {
+                            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                            debugger?.LaunchProductionDebugWithAzureTools2(config.ResourceId, config.WebsiteName, token);
+                        }
+                    });
                 }
             }
            

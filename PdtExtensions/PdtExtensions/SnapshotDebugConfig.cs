@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Client.Entities;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
 {
@@ -7,26 +10,51 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
     [DebuggerDisplay("SiteName = {WebsiteName}, ResourceGroup = {ResourceId}")]
     public sealed class SnapshotDebugConfig
     {
-        public string Subscription { get; set; }
-        
-        public string ResourceId { get; set; }
+        private const string BearerTokenPrefix = "Bearer ";
 
-        public string WebsiteName { get; set; }
-        
-        public override bool Equals(object obj)
+        public string ResourceId { get; }
+
+        public string WebsiteName { get; }
+
+        private IARMRoot _entityRoot;
+
+        public SnapshotDebugConfig(string resourceId, string websiteName, IARMRoot entityRoot)
         {
-            if (obj == null || GetType() != obj.GetType())
+            ResourceId = resourceId;
+            WebsiteName = websiteName;
+            _entityRoot = entityRoot;
+        }
+
+        public async Task<string> GetBearerToken()
+        {
+            string token = string.Empty;
+            if (_entityRoot != null)
             {
-                return false;
+                token = await _entityRoot?.AuthenticationProvider.GetBearerTokenAsync(_entityRoot?.EnvironmentSettings.ARMServiceManagementEndpointUri);
             }
 
-            SnapshotDebugConfig c = (SnapshotDebugConfig)obj;
-            return Subscription == c.Subscription && ResourceId == c.ResourceId && WebsiteName == c.WebsiteName;
+            if (!string.IsNullOrEmpty(token) && !token.StartsWith(BearerTokenPrefix))
+            {
+                token = BearerTokenPrefix + token;
+            }
+
+            return token;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var config = obj as SnapshotDebugConfig;
+            return config != null &&
+                   ResourceId == config.ResourceId &&
+                   WebsiteName == config.WebsiteName;
         }
 
         public override int GetHashCode()
         {
-            return Subscription.GetHashCode() ^ ResourceId.GetHashCode() ^ WebsiteName.GetHashCode();
+            var hashCode = 1723940257;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ResourceId);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(WebsiteName);
+            return hashCode;
         }
 
         public static bool operator ==(SnapshotDebugConfig c1, SnapshotDebugConfig c2)

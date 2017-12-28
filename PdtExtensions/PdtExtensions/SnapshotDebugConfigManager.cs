@@ -46,15 +46,25 @@ namespace Microsoft.VisualStudio.Debugger.Parallel.Extension
             if (selectionDialog?.ShowModal() == true)
             {
                 IEntity entity = selectionDialog.Result;
-                SnapshotDebugConfig config = new SnapshotDebugConfig()
+                
+                if (entity != null)
                 {
-                    Subscription = entity.ToString(),
-                    ResourceId = entity.Id,
-                    WebsiteName = entity.Name
-                };
+                    SnapshotDebugConfig config = new SnapshotDebugConfig(entity.Id, entity.Name, entity.Root);
+                    _configDictionary[projectGuid] = config;
+                    ConfigurationChanged?.Invoke(this, projectGuid);
+                    return config;
+                }
+            }
 
-                _configDictionary[projectGuid] = config;
-                return config;
+            return null;
+        }
+
+        private string GetAccountProperty(IAccount account, string propertyName)
+        {
+            string value = null;
+            if (account?.Properties?.TryGetValue(propertyName, out value) == true)
+            {
+                return value;
             }
 
             return null;
